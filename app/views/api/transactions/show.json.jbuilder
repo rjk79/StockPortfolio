@@ -1,0 +1,1 @@
+json.extract! transaction, :symbol, :price, :quantity

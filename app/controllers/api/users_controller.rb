@@ -10,10 +10,12 @@ class Api::UsersController < ApplicationController
     render :show
   end
 
-  def create
-    
+  def create 
     @user = User.new(user_params)
     if @user.save
+      @balance = Balance.new(:user_id => @user.id, :amount => 5000.0)
+      @balance.save
+
       login(@user)
       render :show
     else

@@ -7,7 +7,16 @@
 #   Character.create(name: 'Luke', movie: movies.first)
 
 User.destroy_all
+Balance.destroy_all
+Transaction.destroy_all
+Holding.destroy_all
 
 ActiveRecord::Base.connection.reset_pk_sequence!('users')
 
 aa = User.create!(name: "Guest", email: "guest@email.com", password: "password")
+
+ba = Balance.create!(user_id: aa.id, amount: 5000.0)
+
+ca = Transaction.create!(user_id: aa.id, symbol: "MSFT", price: 40.05, quantity: 3)
+
+da = Holding.create!(user_id: aa.id, symbol: "MSFT", quantity: 3)

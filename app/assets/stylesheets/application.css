@@ -72,3 +72,22 @@ a:hover, a:active, a:focus {
     background: rgb(41,126,192);
     color: white;
 }
+.title {
+    font-size: 32px;
+    font-weight: 600;
+}
+.subtitle {
+    font-size: 24px;
+    font-weight: 500;
+}
+
+.gray-button {
+    border: 2px solid gray;
+    border-radius: 5px;
+    background: white;
+    color: gray;
+}
+.gray-button:hover {
+    background: gray;
+    color: white;
+}

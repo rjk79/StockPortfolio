@@ -4,7 +4,11 @@
 .session-form {
     margin: 10px;
 }
+.form-title {
+    font-size: 30px;
+}
 .session-form form{
     width: 50%;
 }
+
 

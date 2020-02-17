@@ -59,8 +59,9 @@ class SessionForm extends React.Component {
                     <div className="full-form">
                         
                         <hr className="black-line" />
+                        <div className="form-title">{this.props.path === "/signup" ? "Register" : "Sign In"}</div>
 
-                        <form className="" onSubmit={this.handleSubmit}>
+                        <form onSubmit={this.handleSubmit}>
                             {/* <p className="slogan font-black">{this.props.formType}</p> */}
 
                             {this.props.path === "/signup" ? 
@@ -82,7 +83,9 @@ class SessionForm extends React.Component {
                         <ul>
                             {errors}
                         </ul>
-                        {signupButton}
+
+                        {signupButton} <br/>
+                        <a href="https://iexcloud.io">Data provided by IEX Cloud</a>
                     </div>
                 </div>
             </>

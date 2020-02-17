@@ -5,6 +5,11 @@ class User < ApplicationRecord
   attr_reader :password
   after_initialize :ensure_session_token
 
+  has_one :balance
+  has_many :holdings
+  has_many :transactions
+
+
   def self.find_by_credentials(email, password)
     user = User.find_by(email: email)
     return user if user && BCrypt::Password.new(user.password_digest).is_password?(password)

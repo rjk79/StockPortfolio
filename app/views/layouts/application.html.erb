@@ -27,6 +27,10 @@
           user: current_user
         ).html_safe %></script>
     <% end %>
+
+    <script type="text/javascript">        
+      const iexAPIKey = "<%= Rails.application.credentials[:iex_key] %>"
+    </script>
   </head>
 
   <body>

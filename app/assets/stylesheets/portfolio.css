@@ -1,0 +1,11 @@
+.portfolio form {
+    width: 40%;
+    padding: 5px;
+}
+.portfolio > div {
+    display: flex;
+}
+.holdings {
+    width: 50%;
+    padding: 5px;
+}
