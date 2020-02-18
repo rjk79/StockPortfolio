@@ -8,70 +8,98 @@ class Portfolio extends React.Component {
         this.state = {
             symbol: "",
             quantity: "",
-            error: ""
+            error: "",
         }
         this.handleSubmit = this.handleSubmit.bind(this)
+        this.fetchRecentPrices = this.fetchRecentPrices.bind(this)
     }
     componentDidMount(){
-        // this.fetchData()
+        // this.fetchAndBuy()
+    }
+    fetchRecentPrices(){
+        const {holdings} = this.props
+        const encodedSymbols = holdings.map(holding=>(encodeURI(holding.symbol)))
+        const promise = new Promise((resolve, reject) => { //1
+            const url = `https://cloud.iexapis.com/stable/stock/market/batch?symbols=aapl,fb&types=quote&token=${iexAPIKey}`;
+            $.getJSON(url, data => {
+                resolve(data);
+            });
+        });
+
+        promise.then(data => {
     }
     handleChange(field){
         return e => {
-            this.setState({[field]: e.target.value})
+            this.setState({[field]: e.target.value.toUpperCase()})
         }
+    }
+    isValidQuantity(quantity){
+        const intQuantity = parseInt(quantity)
+        return Number.isInteger(intQuantity)         // make sure its a number, it doesnt have a decimal, and its not 0
+            && quantity.indexOf('.') === -1
+            && quantity.indexOf(',') === -1
+            && intQuantity > 0
     }
     handleSubmit(e){
         e.preventDefault()
+        const {amount} = this.props
         const {symbol, quantity} = this.state
-        const transaction = {symbol, quantity: parseInt(quantity), price: 101.23}
-        symbol = "oij"
-        const price = this.fetchData(symbol)
-        if (price){
-            this.props.createTransaction(transaction)
-        } else {
-            this.setState({error: "Symbol not found"})
+        if (!(this.isValidQuantity(quantity))) {
+            this.setState({error: "Quantity must a positive integer"})
+            return
         }
-    }
-    fetchData(symbol){ 
-        // .toUpperCase()
-        // encodeURI() //for non-ASCII chars
-        var request = new XMLHttpRequest()
-        request.open('GET', `https://cloud.iexapis.com/stable/stock/${symbol}/quote/latestPrice?token=${iexAPIKey}`, true) //true => means async
-        // data weighting 2 per symbol Open/Close
-        // latestPrice, open, close
-        // symbols = goog, aapl
-        // oij = fake symbol
-        request.onload = function () {
-            var data = JSON.parse(this.response)
-            console.log(data)
-            if (request.status >= 200 && request.status < 400) {
-                debugger 
-                //data
-            } else { //e.g 404 Not Found
-                    console.log('error')
-            }
-        }
-        request.send()
+      
+        let encodedSymbol = encodeURI(symbol) //for non-ASCII chars
+        const promise = new Promise((resolve, reject) => { //1
+            const url = `https://cloud.iexapis.com/stable/stock/${encodedSymbol}/quote?token=${iexAPIKey}`;
+            $.getJSON(url, data => {
+                resolve(data);
+            });
+        });
+
+        promise.then(data => {
+            // let price = 324.95
+            debugger
+            const transaction = { symbol, quantity, price: data.latestPrice }   
+            if (!price) {
+                this.setState({ error: "Symbol not found" })
+            } else if (price * parseInt(quantity) > amount) {
+                this.setState({ error: "Not enough cash" })
+            } else {
+                this.props.createTransaction(transaction)
+                this.setState({ error: "", symbol: "", quantity: "" })
+            }   
+        }); //2
     }
     render(){
+        const {holdings, amount} = this.props
+        const holdingsLis = holdings.map((holding, idx) => (
+            <li key={idx}>{holding.symbol} - {holding.quantity} shares</li>
+        ))
+        
         return(
             <div className="portfolio">
             <div className="title">Portfolio</div>
             <div>
                 <div className="holdings">
-                    <div className="subtitle">Holdings</div>
+                    {/* <div className="subtitle">Holdings</div> */}
+                        <ul>
+                            {holdingsLis}
+                        </ul>
                 </div>
                 <form onSubmit={this.handleSubmit}>
-                    <div className="subtitle">Buy Stocks</div>
+                        
+                    <div className="subtitle">Cash: ${Math.ceil(amount * 100) / 100}</div>
                     <div className="form-group">
                         <label htmlFor="symbol">Symbol</label>
-                        <input id="symbol" className="form-control" value={this.state.symbol} onChange={this.handleChange("symbol")} type="text" placeholder="Symbol" required/>
+                        <input id="symbol" className="form-control" value={this.state.symbol} onChange={this.handleChange("symbol")} type="text" placeholder="Symbol (e.g. MSFT)" required/>
                     </div>
                     <div className="form-group">
                         <label htmlFor="quantity">Quantity</label>
                             <input id="quantity" className="form-control" value={this.state.quantity} onChange={this.handleChange("quantity")} type="text" placeholder="Quantity" required/>
                     </div>
-                    <input className="blue-button" type="submit" value="Submit" />
+                    <input className="blue-button" type="submit" value="Buy" /> <br/>
+                    {this.state.error.length ? this.state.error : null}
                 </form>
             </div>
             </div>
@@ -80,14 +108,20 @@ class Portfolio extends React.Component {
 }
 
 const msp = (state) => {
+    const {entities, session} = state
+    let balance = entities.balances[session.id]
+    let amount
+    if (balance){amount = balance.amount}
     return {
-        holdings: state.entities.holdings
+        amount,
+        currentUserId: session.id,
+        holdings: Object.values(entities.holdings)
     }
 }
 
 const mdp = (dispatch) => {
     return {
-        createTransaction: transaction => dispatch(createTransaction(transaction))
+        createTransaction: transaction => dispatch(createTransaction(transaction)),
     }
 }
 

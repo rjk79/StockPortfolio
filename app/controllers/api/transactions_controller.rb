@@ -1,12 +1,18 @@
 class Api::TransactionsController < ApplicationController
+
+
     def create
-        if !update_balance(params[:price] * params[:quantity])  #attempt to
-            render json: {status: "error", code: 422, message: "Not enough in balance"}
+        price = params[:transaction][:price].to_f
+        quantity = params[:transaction][:quantity].to_i
+        symbol = params[:transaction][:symbol]
+        # user = current_user
+        if !update_balance(price * quantity)  #attempt to
+            return render json: ['Not enough cash'], status: 422 
         end
         @transaction = Transaction.new(transaction_params)
         @transaction.user_id = current_user.id
         if @transaction.save
-            @holding = update_holdings(params[:symbol], params[:quantity])
+            @holding = update_holdings(symbol, quantity)
             render :show
         else
             render json: @transaction.errors.full_messages, status: 422 #unprocesssable entity
@@ -16,6 +22,7 @@ class Api::TransactionsController < ApplicationController
 
     private
     def update_holdings(symbol, quantity)
+        
         @holding = current_user.holdings.find_by(symbol: symbol)
         if @holding
             @holding.quantity += quantity
@@ -23,6 +30,7 @@ class Api::TransactionsController < ApplicationController
             @holding = Holding.new(:quantity => quantity, 
                                     :user_id => current_user.id, 
                                     :symbol => symbol)
+        end
         @holding.save
         return @holding
     end

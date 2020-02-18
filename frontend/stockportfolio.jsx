@@ -2,6 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import Root from './components/root';
 import configureStore from './store/store';
+import {pick} from 'lodash'
 
 document.addEventListener("DOMContentLoaded", () => {
     
@@ -10,7 +11,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (window.currentUser) {
         const preloadedState = {
             entities: {
-                users: { [window.currentUser.id]: window.currentUser }
+                users: { [window.currentUser.id]: pick(window.currentUser, 'id', 'name', 'email') }
             },
             session: { id: window.currentUser.id }
         };

@@ -41,13 +41,13 @@ class SessionForm extends React.Component {
         let signupButton = this.props.formType === "Log In" ?
             <>
                 <br />
-                <p className="font-black small">Don't have an account?</p>
+                <span className="font-black small">Don't have an account?</span>&nbsp;
                 <Link to="/signup" className="bw-button small long-padding" >
                     Sign Up
             </Link>
             </> : <>
                 <br />
-                <p className="font-black small">Already have an account?</p>
+                <span className="font-black small">Already have an account?</span>&nbsp;
                 <Link to="/login" className="bw-button small long-padding" >
                     Log In
             </Link>
@@ -58,8 +58,8 @@ class SessionForm extends React.Component {
                 <div className="session-form">
                     <div className="full-form">
                         
-                        <hr className="black-line" />
                         <div className="form-title">{this.props.path === "/signup" ? "Register" : "Sign In"}</div>
+                        <hr className="black-line" />
 
                         <form onSubmit={this.handleSubmit}>
                             {/* <p className="slogan font-black">{this.props.formType}</p> */}

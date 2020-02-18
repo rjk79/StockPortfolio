@@ -4,7 +4,7 @@ json.extract! user, :id, :name, :email
 json.transactions do
     user.transactions.each do |transaction|
       json.set! transaction.id do
-        json.extract! transaction, :symbol, :quantity, :price
+        json.extract! transaction, :id, :symbol, :quantity, :price
       end
     end
 end

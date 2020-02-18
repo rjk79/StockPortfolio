@@ -5,24 +5,29 @@ import { Link, Switch } from 'react-router-dom'
 import { ProtectedRoute } from '../util/route_util'
 import Portfolio from './portfolio'
 import Transactions from './transactions'
+import {fetchUser} from '../actions/user_actions'
 
 class Main extends React.Component {
     constructor(props){
         super(props)
         this.handleLogOut = this.handleLogOut.bind(this)
     }
+    componentDidMount(){
+        const {fetchUser, currentUser} = this.props
+        
+        fetchUser(currentUser.id)
+    }
     handleLogOut(e){
         e.preventDefault()
         this.props.logout()
     }
     render(){
-        // debugger
         return (
             <>
-            <h1>Welcome {this.props.currentUser}</h1>
+            <h1>Welcome {this.props.currentUser.name}</h1>
             <button className="gray-button" onClick={this.handleLogOut}>Log Out</button>
             <div className="navbar">
-                <Link  to="/portfolio">Portfolio</Link>
+                <Link  to="/portfolio">Portfolio</Link> | 
                 <Link  to="/transactions">Transactions</Link>
             </div>
             <Switch>
@@ -38,7 +43,7 @@ class Main extends React.Component {
 
 const msp = state => {
     const currentUserId = state.session.id
-    const currentUser = state.entities.users[currentUserId].name
+    const currentUser = state.entities.users[currentUserId]
     return {
         currentUser
     }
@@ -47,6 +52,7 @@ const msp = state => {
 const mdp = (dispatch) => {
     return {
         logout: () => dispatch(logout()),
+        fetchUser: id => dispatch(fetchUser(id))
     }
 }
 

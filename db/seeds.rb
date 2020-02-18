@@ -11,7 +11,9 @@ Balance.destroy_all
 Transaction.destroy_all
 Holding.destroy_all
 
-ActiveRecord::Base.connection.reset_pk_sequence!('users')
+ActiveRecord::Base.connection.tables.each do |t|
+  ActiveRecord::Base.connection.reset_pk_sequence!(t)
+end
 
 aa = User.create!(name: "Guest", email: "guest@email.com", password: "password")
 
