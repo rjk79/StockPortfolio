@@ -73,8 +73,8 @@ a:hover, a:active, a:focus {
     color: white;
 }
 .title {
-    font-size: 32px;
-    font-weight: 600;
+    font-size: 30px;
+    font-weight: 500;
 }
 .subtitle {
     font-size: 24px;
@@ -90,4 +90,9 @@ a:hover, a:active, a:focus {
 .gray-button:hover {
     background: gray;
     color: white;
+}
+
+li {
+    padding: 5px;
+    border-bottom: 1px solid black;
 }

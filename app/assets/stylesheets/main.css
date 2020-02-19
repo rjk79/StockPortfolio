@@ -1,3 +1,16 @@
 .navbar a{
     padding: 5px;
 }
+
+.welcome {
+    padding: 5px;
+}
+.logout {
+    font-size: 12px;
+}
+.menu {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 5px 5px;
+}

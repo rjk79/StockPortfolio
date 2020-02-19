@@ -1,6 +1,6 @@
 .portfolio form {
     width: 40%;
-    padding: 5px;
+    padding: 17px;
 }
 .portfolio > div {
     display: flex;
@@ -8,4 +8,18 @@
 .holdings {
     width: 50%;
     padding: 5px;
+    margin-left: 5%;
+    border-right: 2px solid black;
+}
+[data-status="1"]{
+    color: green;
+}
+[data-status="-1"]{
+    color: red; 
+}
+[data-status="0"]{
+    color: gray; 
+}
+.portfolio form [type="submit"] {
+    width: 100%;
 }

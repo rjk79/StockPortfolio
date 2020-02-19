@@ -9,7 +9,7 @@ class Transactions extends React.Component {
     render() {
         const {transactions} = this.props
         let transactionLis = transactions.map((transaction,idx)=>(
-            <li key={idx}>BUY ({transaction.symbol}) - {transaction.quantity} shares @ {transaction.price}</li>
+            <li key={idx}>BUY ({transaction.symbol}) - {transaction.quantity} shares @ ${transaction.price}</li>
         ))
         return (
             <>

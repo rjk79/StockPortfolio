@@ -1,6 +1,7 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import {createTransaction} from '../actions/transaction_actions'
+import {fetchStock, fetchStocks} from '../actions/stock_actions'
 
 class Portfolio extends React.Component {
     constructor(props){
@@ -11,23 +12,10 @@ class Portfolio extends React.Component {
             error: "",
         }
         this.handleSubmit = this.handleSubmit.bind(this)
-        this.fetchRecentPrices = this.fetchRecentPrices.bind(this)
     }
     componentDidMount(){
-        // this.fetchAndBuy()
     }
-    fetchRecentPrices(){
-        const {holdings} = this.props
-        const encodedSymbols = holdings.map(holding=>(encodeURI(holding.symbol)))
-        const promise = new Promise((resolve, reject) => { //1
-            const url = `https://cloud.iexapis.com/stable/stock/market/batch?symbols=aapl,fb&types=quote&token=${iexAPIKey}`;
-            $.getJSON(url, data => {
-                resolve(data);
-            });
-        });
 
-        promise.then(data => {
-    }
     handleChange(field){
         return e => {
             this.setState({[field]: e.target.value.toUpperCase()})
@@ -42,7 +30,8 @@ class Portfolio extends React.Component {
     }
     handleSubmit(e){
         e.preventDefault()
-        const {amount} = this.props
+        var self = this
+        const {amount, fetchStock} = this.props
         const {symbol, quantity} = this.state
         if (!(this.isValidQuantity(quantity))) {
             this.setState({error: "Quantity must a positive integer"})
@@ -50,39 +39,65 @@ class Portfolio extends React.Component {
         }
       
         let encodedSymbol = encodeURI(symbol) //for non-ASCII chars
-        const promise = new Promise((resolve, reject) => { //1
-            const url = `https://cloud.iexapis.com/stable/stock/${encodedSymbol}/quote?token=${iexAPIKey}`;
-            $.getJSON(url, data => {
-                resolve(data);
-            });
-        });
 
-        promise.then(data => {
+        fetchStock(encodedSymbol)
+            .then(res => {
             // let price = 324.95
-            debugger
-            const transaction = { symbol, quantity, price: data.latestPrice }   
+            let price
+            // debugger
+            const {stocks} = self.props
+            let stock = stocks[symbol]
+            if (stock){price = stock.latestPrice}
+            const transaction = { symbol, quantity, price }   
             if (!price) {
-                this.setState({ error: "Symbol not found" })
+                // this.setState({ error: "Symbol not found" })
             } else if (price * parseInt(quantity) > amount) {
                 this.setState({ error: "Not enough cash" })
             } else {
                 this.props.createTransaction(transaction)
                 this.setState({ error: "", symbol: "", quantity: "" })
             }   
-        }); //2
+        }) //2
+            // .catch(err => {
+            //     this.setState({ error: "Symbol not found" })
+            // })
+    }
+    roundToCent(num){
+        return Math.ceil(num * 100) / 100
     }
     render(){
-        const {holdings, amount} = this.props
-        const holdingsLis = holdings.map((holding, idx) => (
-            <li key={idx}>{holding.symbol} - {holding.quantity} shares</li>
-        ))
+        const {holdings, amount, stocks} = this.props
+        let symbol
+        let stock
+        let status
+        let value = 0
+        let curr
+        for (let i = 0;i < holdings.length;i++){
+            curr = stocks[holdings[i].symbol]
+            if (!curr){continue}
+            value += curr.latestPrice * holdings[i].quantity
+        }
+        const holdingsLis = holdings.map((holding, idx) => {
+            symbol = holding.symbol
+            stock = stocks[symbol] || {symbol: "", open: 0, latestPrice: 0}
+            
+            if (stock.open < stock.latestPrice){
+                status = "1"
+            } else if (stock.open > stock.latestPrice) {
+                status = "-1"
+            } else {
+                status = "0"
+            }
+            return (
+                <li key={idx} data-status={status}>{symbol} - {holding.quantity} shares - ${this.roundToCent(holding.quantity * stock.latestPrice)}</li>
+        )})
         
         return(
             <div className="portfolio">
-            <div className="title">Portfolio</div>
             <div>
                 <div className="holdings">
-                    {/* <div className="subtitle">Holdings</div> */}
+                <div className="title">Portfolio (${this.roundToCent(value)})</div>
+                    {/* <div className="subtitle">(${this.roundToCent(value)})</div> */}
                         <ul>
                             {holdingsLis}
                         </ul>
@@ -115,13 +130,15 @@ const msp = (state) => {
     return {
         amount,
         currentUserId: session.id,
-        holdings: Object.values(entities.holdings)
+        holdings: Object.values(entities.holdings),
+        stocks: entities.stocks
     }
 }
 
 const mdp = (dispatch) => {
     return {
         createTransaction: transaction => dispatch(createTransaction(transaction)),
+        fetchStock: symbol => dispatch(fetchStock(symbol)),
     }
 }
 
