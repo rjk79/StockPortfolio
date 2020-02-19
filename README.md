@@ -1,24 +1,14 @@
-# README
+# Stock Portolio
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+Live Site: http://portfolio-rjk.herokuapp.com/#/
 
-Things you may want to cover:
+Built using React, Rails, and Redux.
+Uses financial API data from IEX.
 
-* Ruby version
-
-* System dependencies
-
-* Configuration
-
-* Database creation
-
-* Database initialization
-
-* How to run the test suite
-
-* Services (job queues, cache servers, search engines, etc.)
-
-* Deployment instructions
-
-* ...
+### Features:
+Users can:
+- sign up/ sign in
+- purchase stocks 
+  - checks for valid ticker / valid quantity / adequate cash 
+- view transaction history 
+  - shows historical price
