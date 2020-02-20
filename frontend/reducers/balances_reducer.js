@@ -12,7 +12,7 @@ const balancesReducer = (state = {}, action) => {
             return action.user.balances
         case RECEIVE_TRANSACTION:
             
-            const {amount, user_id} = Object.values(action.transaction.balance)[0] //just one
+            const {amount, user_id} = Object.values(action.transaction.balance)[0] //there's just one
             let newState = merge({}, state)
             newState[user_id].amount = amount
             return merge({}, state, newState)

@@ -4,9 +4,8 @@ class Api::TransactionsController < ApplicationController
     def create
         price = params[:transaction][:price].to_f
         quantity = params[:transaction][:quantity].to_i
-        symbol = params[:transaction][:symbol]
-        # user = current_user
-        if !update_balance(price * quantity)  #attempt to
+        symbol = params[:transaction][:symbol] # user = current_user
+        if !update_balance(price * quantity)  #attempt to update balance
             return render json: ['Not enough cash'], status: 422 
         end
         @transaction = Transaction.new(transaction_params)
@@ -22,7 +21,6 @@ class Api::TransactionsController < ApplicationController
 
     private
     def update_holdings(symbol, quantity)
-        
         @holding = current_user.holdings.find_by(symbol: symbol)
         if @holding
             @holding.quantity += quantity
